@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memo MVP</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 24px; background: #f7f7fb; color: #111; }
+      .card { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 20px; }
+      h1 { margin: 0 0 12px; font-size: 24px; }
+      .row { display: flex; gap: 12px; align-items: center; margin: 12px 0; }
+      .status { padding: 6px 10px; border-radius: 999px; background: #eef; color: #223; font-size: 12px; }
+      button { background: #4f46e5; color: #fff; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+      button:disabled { background: #b9b6f2; cursor: not-allowed; }
+      .log { background: #0c1116; color: #e6edf3; font-family: ui-monospace, Menlo, Monaco, monospace; border-radius: 8px; padding: 12px; height: 200px; overflow: auto; font-size: 12px; }
+      label { font-size: 12px; color: #444; }
+      input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Memo – Proactive Assistant (MVP)</h1>
+      <div class="row">
+        <span class="status" id="sensorStatus">Sensor: idle</span>
+        <span class="status" id="assistantStatus">Assistant: waiting</span>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Preferred name</label>
+          <input id="preferredName" placeholder="e.g., Marie" />
+        </div>
+        <div>
+          <label>Location context</label>
+          <input id="location" placeholder="e.g., kitchen" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="startPolling">Start Sensor</button>
+        <button id="stopPolling" disabled>Stop Sensor</button>
+        <button id="testSpeak">Test Speak</button>
+      </div>
+
+      <div class="log" id="log"></div>
+    </div>
+
+    <script>
+      const logEl = document.getElementById('log');
+      const sensorStatusEl = document.getElementById('sensorStatus');
+      const assistantStatusEl = document.getElementById('assistantStatus');
+      const startBtn = document.getElementById('startPolling');
+      const stopBtn = document.getElementById('stopPolling');
+      const testSpeakBtn = document.getElementById('testSpeak');
+      const preferredNameEl = document.getElementById('preferredName');
+      const locationEl = document.getElementById('location');
+
+      let intervalId = null;
+      let suppressUntil = 0;
+
+      function appendLog(msg) {
+        const time = new Date().toLocaleTimeString();
+        logEl.textContent += `[${time}] ${msg}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function speak(text) {
+        if (!('speechSynthesis' in window)) {
+          appendLog('SpeechSynthesis not supported in this browser');
+          return;
+        }
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.95; // slightly slower
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+      }
+
+      async function getAssistantMessage() {
+        assistantStatusEl.textContent = 'Assistant: thinking…';
+        const context = {
+          preferredName: preferredNameEl.value || undefined,
+          location: locationEl.value || undefined,
+          timeOfDay: new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening')
+        };
+        try {
+          const res = await fetch('/api/assistant/respond', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ context })
+          });
+          const data = await res.json();
+          if (data?.text) {
+            appendLog('Assistant: ' + data.text);
+            speak(data.text);
+          } else {
+            appendLog('Assistant error: malformed response');
+          }
+        } catch (e) {
+          appendLog('Assistant error: ' + e);
+        } finally {
+          assistantStatusEl.textContent = 'Assistant: waiting';
+        }
+      }
+
+      async function pollSensorOnce() {
+        try {
+          sensorStatusEl.textContent = 'Sensor: polling…';
+          const res = await fetch('/api/sensor');
+          const data = await res.json();
+          appendLog('Sensor: ' + JSON.stringify(data));
+          sensorStatusEl.textContent = 'Sensor: ok';
+
+          // Map sensor format: launch when last_value > 10 (string numeric)
+          const numericLast = typeof data.last_value === 'string' ? parseFloat(data.last_value) : NaN;
+          const crossedByLastValue = Number.isFinite(numericLast) && numericLast > 10;
+          const crossedFallback = Boolean(
+            data.crossed ?? data.detected ?? data.presence ?? data.trigger ?? false
+          );
+          const crossed = crossedByLastValue || crossedFallback;
+
+          const now = Date.now();
+          if (crossed && now > suppressUntil) {
+            suppressUntil = now + 20_000; // debounce for 20 seconds to avoid repeats
+            appendLog('Presence detected → triggering assistant');
+            getAssistantMessage();
+          }
+        } catch (e) {
+          sensorStatusEl.textContent = 'Sensor: error';
+          appendLog('Sensor error: ' + e);
+        }
+      }
+
+      startBtn.addEventListener('click', () => {
+        if (intervalId) return;
+        appendLog('Starting 2s polling');
+        intervalId = setInterval(pollSensorOnce, 2000);
+        pollSensorOnce(); // immediate
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+      });
+
+      stopBtn.addEventListener('click', () => {
+        if (!intervalId) return;
+        clearInterval(intervalId);
+        intervalId = null;
+        appendLog('Stopped polling');
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        sensorStatusEl.textContent = 'Sensor: idle';
+      });
+
+      testSpeakBtn.addEventListener('click', () => {
+        speak('Hello, I am Memo. I am here to help you.');
+      });
+    </script>
+  </body>
+  </html>
+
+
