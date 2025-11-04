@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Memo - Espace Clinique / Marie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --data: #111827;
+        --chip: #eef2ff;
+        --chip-text: #1e40af;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg); color: var(--text);
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 28px; }
+      .title { font-size: 22px; font-weight: 800; margin-bottom: 18px; }
+      .grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+      @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+      .card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+      }
+      .section-title { font-weight: 700; margin-bottom: 8px; }
+      .metrics { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .metric {
+        display: flex; justify-content: space-between; align-items: baseline;
+        padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px;
+      }
+      .metric .label { color: var(--muted); }
+      .metric .value { color: var(--data); font-weight: 800; }
+      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+      .chip { background: var(--chip); color: var(--chip-text); padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+      .row { display: flex; gap: 10px; align-items: center; }
+      button {
+        background: #1d4ed8; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer;
+      }
+      .note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div style="margin-bottom: 16px;">
+        <a href="index.html" style="color: #2563eb; text-decoration: none; font-weight: 600;">← Home</a>
+      </div>
+      <div class="title">Memo — Espace Clinique / Marie</div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="section-title">Tableau de Bord des Tendances</div>
+          <div class="metrics" id="metrics">
+            <div class="metric">
+              <span class="label">Adhésion Thérapeutique</span>
+              <span class="value" id="adh">95%</span>
+            </div>
+            <div class="metric">
+              <span class="label">Fréquence de Confusion (EF-08 - Simulé)</span>
+              <span class="value" id="conf">3/sem (Stable)</span>
+            </div>
+            <div class="metric">
+              <span class="label">Hydratation Quotidienne</span>
+              <span class="value" id="hydr">2.0 L</span>
+            </div>
+          </div>
+          <div class="chips">
+            <div class="chip">Tendance: Stable</div>
+            <div class="chip">Observations: Routine cohérente</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Rapports (EF-36)</div>
+          <div class="row">
+            <button id="dlReport">Télécharger Rapport Mensuel</button>
+            <span class="note" id="dlNote">Simulation: un PDF fictif sera téléchargé.</span>
+          </div>
+          <div class="note">Les valeurs affichées ci-dessus sont simulées pour le MVP.</div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:16px">
+        Sécurité des Données: les informations sont anonymisées (EF-36) et traitées avec le consentement explicite du patient (EF-39). Ce MVP ne stocke aucune donnée personnelle côté serveur.
+      </div>
+    </div>
+
+    <script>
+      // Simulation de la génération/téléchargement d'un rapport PDF basique (fichier texte renommé)
+      document.getElementById('dlReport').addEventListener('click', () => {
+        const content = [
+          'Rapport Mensuel - Memo (Simulation)',
+          'Patient: Marie',
+          '—',
+          `Adhésion Thérapeutique: ${document.getElementById('adh').textContent}`,
+          `Fréquence de Confusion: ${document.getElementById('conf').textContent}`,
+          `Hydratation: ${document.getElementById('hydr').textContent}`,
+          '',
+          'Observations: Routine globalement stable. Aucun événement critique enregistré.',
+          'Note: Rapport généré pour démonstration MVP (EF-36).'
+        ].join('\n');
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'rapport_mensuel_memo_SIMULATION.txt';
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+
+        const note = document.getElementById('dlNote');
+        note.textContent = 'Téléchargement simulé effectué.';
+        setTimeout(() => note.textContent = 'Simulation: un PDF fictif sera téléchargé.', 2500);
+      });
+    </script>
+  </body>
+</html>
+

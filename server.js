@@ -64,15 +64,25 @@ app.post('/api/assistant/respond', async (req, res) => {
   if (!genAI) {
     return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' });
   }
-  const { context } = req.body || {};
+  const { context, userMessage } = req.body || {};
   const preferredName = context?.preferredName || 'there';
   const location = context?.location || 'home';
   const timeOfDay = context?.timeOfDay || '';
 
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const userPrompt = `Context: location=${location}, timeOfDay=${timeOfDay}, preferredName=${preferredName}\n` +
-      'Please produce a single short proactive greeting and offer of help suitable for speaking aloud.';
+    
+    let userPrompt;
+    if (userMessage && userMessage.trim()) {
+      // Conversational mode: user has spoken
+      userPrompt = `Context: location=${location}, timeOfDay=${timeOfDay}, preferredName=${preferredName}\n` +
+        `User said: "${userMessage.trim()}"\n` +
+        'Please respond naturally and helpfully, keeping it short (1-2 sentences).';
+    } else {
+      // Proactive mode: no user input, just greeting
+      userPrompt = `Context: location=${location}, timeOfDay=${timeOfDay}, preferredName=${preferredName}\n` +
+        'Please produce a single short proactive greeting and offer of help suitable for speaking aloud.';
+    }
 
     const result = await model.generateContent([
       { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },

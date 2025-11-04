@@ -3,160 +3,163 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memo MVP</title>
+    <title>Memo MVP - Home</title>
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 24px; background: #f7f7fb; color: #111; }
-      .card { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 20px; }
-      h1 { margin: 0 0 12px; font-size: 24px; }
-      .row { display: flex; gap: 12px; align-items: center; margin: 12px 0; }
-      .status { padding: 6px 10px; border-radius: 999px; background: #eef; color: #223; font-size: 12px; }
-      button { background: #4f46e5; color: #fff; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
-      button:disabled { background: #b9b6f2; cursor: not-allowed; }
-      .log { background: #0c1116; color: #e6edf3; font-family: ui-monospace, Menlo, Monaco, monospace; border-radius: 8px; padding: 12px; height: 200px; overflow: auto; font-size: 12px; }
-      label { font-size: 12px; color: #444; }
-      input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 24px;
+        color: #111;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 48px;
+      }
+      .header h1 {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      .header p {
+        font-size: 18px;
+        opacity: 0.95;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      }
+      .card-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #1e293b;
+      }
+      .card-desc {
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+      .card-patient { border-top: 4px solid #16a34a; }
+      .card-aidant { border-top: 4px solid #2563eb; }
+      .card-medecin { border-top: 4px solid #7c3aed; }
+      .quick-access {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        margin-top: 32px;
+      }
+      .quick-access h2 {
+        font-size: 20px;
+        margin-bottom: 16px;
+        color: #1e293b;
+      }
+      .quick-links {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .quick-link {
+        background: #f1f5f9;
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #475569;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+      .quick-link:hover {
+        background: #e2e8f0;
+      }
+      .footer {
+        text-align: center;
+        color: white;
+        margin-top: 48px;
+        opacity: 0.9;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
-    <div class="card">
-      <h1>Memo – Proactive Assistant (MVP)</h1>
-      <div class="row">
-        <span class="status" id="sensorStatus">Sensor: idle</span>
-        <span class="status" id="assistantStatus">Assistant: waiting</span>
+    <div class="container">
+      <div class="header">
+        <h1>Memo</h1>
+        <p>Proactive AI Assistant for Cognitive Care</p>
       </div>
 
       <div class="grid">
-        <div>
-          <label>Preferred name</label>
-          <input id="preferredName" placeholder="e.g., Marie" />
-        </div>
-        <div>
-          <label>Location context</label>
-          <input id="location" placeholder="e.g., kitchen" />
+        <a href="patient_interface.html" class="card card-patient">
+          <div class="card-icon">👤</div>
+          <div class="card-title">Patient Interface</div>
+          <div class="card-desc">
+            Interactive voice assistant for patients. Speak naturally with Memo, receive gentle reminders and support.
+            Features voice recognition (STT) and speech synthesis (TTS).
+          </div>
+        </a>
+
+        <a href="aidant_interface.html" class="card card-aidant">
+          <div class="card-icon">👨‍👩‍👧</div>
+          <div class="card-title">Family Caregiver</div>
+          <div class="card-desc">
+            Monitor activity, manage reminders, and view the patient's interaction history. 
+            Access safety dashboard and configure life repertoire settings.
+          </div>
+        </a>
+
+        <a href="medecin_interface.html" class="card card-medecin">
+          <div class="card-icon">👨‍⚕️</div>
+          <div class="card-title">Clinical Space</div>
+          <div class="card-desc">
+            View aggregated trends, therapy adherence metrics, and generate clinical reports. 
+            Data-focused interface for healthcare professionals.
+          </div>
+        </a>
+      </div>
+
+      <div class="quick-access">
+        <h2>Quick Access</h2>
+        <div class="quick-links">
+          <a href="patient_interface.html" class="quick-link">Patient Interface</a>
+          <a href="aidant_interface.html" class="quick-link">Family Dashboard</a>
+          <a href="medecin_interface.html" class="quick-link">Clinical Reports</a>
+          <a href="sensor_control.html" class="quick-link">Sensor Control</a>
         </div>
       </div>
 
-      <div class="row">
-        <button id="startPolling">Start Sensor</button>
-        <button id="stopPolling" disabled>Stop Sensor</button>
-        <button id="testSpeak">Test Speak</button>
+      <div class="footer">
+        <p>Memo MVP - Proactive AI Assistant & IoT Integration</p>
+        <p style="margin-top: 8px; font-size: 12px;">Powered by Google Gemini AI</p>
       </div>
-
-      <div class="log" id="log"></div>
     </div>
-
-    <script>
-      const logEl = document.getElementById('log');
-      const sensorStatusEl = document.getElementById('sensorStatus');
-      const assistantStatusEl = document.getElementById('assistantStatus');
-      const startBtn = document.getElementById('startPolling');
-      const stopBtn = document.getElementById('stopPolling');
-      const testSpeakBtn = document.getElementById('testSpeak');
-      const preferredNameEl = document.getElementById('preferredName');
-      const locationEl = document.getElementById('location');
-
-      let intervalId = null;
-      let suppressUntil = 0;
-
-      function appendLog(msg) {
-        const time = new Date().toLocaleTimeString();
-        logEl.textContent += `[${time}] ${msg}\n`;
-        logEl.scrollTop = logEl.scrollHeight;
-      }
-
-      function speak(text) {
-        if (!('speechSynthesis' in window)) {
-          appendLog('SpeechSynthesis not supported in this browser');
-          return;
-        }
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.rate = 0.95; // slightly slower
-        utter.pitch = 1.0;
-        utter.volume = 1.0;
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utter);
-      }
-
-      async function getAssistantMessage() {
-        assistantStatusEl.textContent = 'Assistant: thinking…';
-        const context = {
-          preferredName: preferredNameEl.value || undefined,
-          location: locationEl.value || undefined,
-          timeOfDay: new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening')
-        };
-        try {
-          const res = await fetch('/api/assistant/respond', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context })
-          });
-          const data = await res.json();
-          if (data?.text) {
-            appendLog('Assistant: ' + data.text);
-            speak(data.text);
-          } else {
-            appendLog('Assistant error: malformed response');
-          }
-        } catch (e) {
-          appendLog('Assistant error: ' + e);
-        } finally {
-          assistantStatusEl.textContent = 'Assistant: waiting';
-        }
-      }
-
-      async function pollSensorOnce() {
-        try {
-          sensorStatusEl.textContent = 'Sensor: polling…';
-          const res = await fetch('/api/sensor');
-          const data = await res.json();
-          appendLog('Sensor: ' + JSON.stringify(data));
-          sensorStatusEl.textContent = 'Sensor: ok';
-
-          // Map sensor format: launch when last_value > 10 (string numeric)
-          const numericLast = typeof data.last_value === 'string' ? parseFloat(data.last_value) : NaN;
-          const crossedByLastValue = Number.isFinite(numericLast) && numericLast > 10;
-          const crossedFallback = Boolean(
-            data.crossed ?? data.detected ?? data.presence ?? data.trigger ?? false
-          );
-          const crossed = crossedByLastValue || crossedFallback;
-
-          const now = Date.now();
-          if (crossed && now > suppressUntil) {
-            suppressUntil = now + 20_000; // debounce for 20 seconds to avoid repeats
-            appendLog('Presence detected → triggering assistant');
-            getAssistantMessage();
-          }
-        } catch (e) {
-          sensorStatusEl.textContent = 'Sensor: error';
-          appendLog('Sensor error: ' + e);
-        }
-      }
-
-      startBtn.addEventListener('click', () => {
-        if (intervalId) return;
-        appendLog('Starting 2s polling');
-        intervalId = setInterval(pollSensorOnce, 2000);
-        pollSensorOnce(); // immediate
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-      });
-
-      stopBtn.addEventListener('click', () => {
-        if (!intervalId) return;
-        clearInterval(intervalId);
-        intervalId = null;
-        appendLog('Stopped polling');
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        sensorStatusEl.textContent = 'Sensor: idle';
-      });
-
-      testSpeakBtn.addEventListener('click', () => {
-        speak('Hello, I am Memo. I am here to help you.');
-      });
-    </script>
   </body>
-  </html>
-
-
+</html>

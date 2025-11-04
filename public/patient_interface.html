@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Memo - Mon Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #f7f8fc;
+        --panel: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #16a34a; /* vert chaleureux */
+        --accent-soft: #dcfce7;
+        --border: #e2e8f0;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg); color: var(--text);
+      }
+      .wrap {
+        max-width: 720px; margin: 0 auto; padding: 24px;
+      }
+      .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(2,6,23,0.06);
+      }
+      .header {
+        display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px;
+      }
+      .title { font-size: 22px; font-weight: 700; }
+      .clock { font-size: 14px; color: var(--muted); }
+      .chat {
+        display: flex; flex-direction: column; gap: 10px; margin: 14px 0 18px;
+      }
+      .bubble {
+        max-width: 85%; padding: 12px 14px; border-radius: 14px;
+        font-size: 15px; line-height: 1.4; border: 1px solid var(--border);
+      }
+      .memo { align-self: flex-start; background: var(--accent-soft); border-color: #bbf7d0; color: #064e3b; }
+      .user { align-self: flex-end; background: #eef2ff; border-color: #c7d2fe; color: #1e293b; }
+      .row { display: flex; gap: 10px; }
+      input[type="text"] {
+        flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
+        background: #fff;
+      }
+      button {
+        background: var(--accent); color: #fff; border: 0; border-radius: 10px;
+        padding: 10px 14px; font-weight: 600; cursor: pointer;
+      }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div style="margin-bottom: 16px;">
+        <a href="index.html" style="color: #2563eb; text-decoration: none; font-weight: 600;">← Home</a>
+      </div>
+      <div class="card">
+        <div class="header">
+          <div class="title">Memo — Mon Assistant</div>
+          <div class="clock" id="clock">--:--</div>
+        </div>
+
+        <div class="chat" id="chat">
+          <!-- bulles insérées par JS -->
+        </div>
+
+        <div class="row">
+          <input id="userInput" type="text" placeholder="Votre message…" />
+          <button id="micBtn" style="background: #dc2626;">🎤 Micro</button>
+          <button id="speakBtn">Parler / Activer</button>
+        </div>
+        <div class="hint">Astuce: cliquez sur "🎤 Micro" pour parler, ou "Parler / Activer" pour simuler le déclenchement (capteur).</div>
+      </div>
+    </div>
+
+    <script>
+      const chat = document.getElementById('chat');
+      const clock = document.getElementById('clock');
+      const input = document.getElementById('userInput');
+      const speakBtn = document.getElementById('speakBtn');
+      const micBtn = document.getElementById('micBtn');
+
+      const patientName = 'Marie';      // simulé
+      const locationCtx = 'cuisine';    // simulé
+      let recognition = null;
+      let isListening = false;
+
+      // Initialize Speech Recognition (STT)
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US'; // English language
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = async (event) => {
+          const transcript = event.results[0][0].transcript;
+          addBubble(transcript, 'user');
+          isListening = false;
+          micBtn.textContent = '🎤 Micro';
+          micBtn.style.background = '#dc2626';
+
+          // Send to assistant API
+          try {
+            const res = await fetch('/api/assistant/respond', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                context: {
+                  preferredName: patientName,
+                  location: locationCtx,
+                  timeOfDay: new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening')
+                },
+                userMessage: transcript
+              })
+            });
+            const data = await res.json();
+            if (data?.text) {
+              addBubble(data.text, 'memo');
+              speak(data.text);
+            }
+          } catch (e) {
+            addBubble('Erreur: ' + e, 'memo');
+          }
+        };
+
+        recognition.onerror = (event) => {
+            addBubble('Recognition error: ' + event.error, 'memo');
+          isListening = false;
+          micBtn.textContent = '🎤 Micro';
+          micBtn.style.background = '#dc2626';
+        };
+
+        recognition.onend = () => {
+          if (isListening) {
+            try {
+              recognition.start();
+            } catch (e) {
+              isListening = false;
+              micBtn.textContent = '🎤 Micro';
+              micBtn.style.background = '#dc2626';
+            }
+          }
+        };
+      }
+
+      function updateClock() {
+        const d = new Date();
+        clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      setInterval(updateClock, 1000); updateClock();
+
+      function addBubble(text, who = 'memo') {
+        const div = document.createElement('div');
+        div.className = 'bubble ' + (who === 'memo' ? 'memo' : 'user');
+        div.textContent = text;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95; u.pitch = 1.0; u.volume = 1.0;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }
+
+      function simulateScenario() {
+        const line = `Bonjour ${patientName}. Je vois que tu es dans la ${locationCtx}. As-tu pris tes vitamines pour la journée ?`;
+        addBubble(line, 'memo');
+        speak(line);
+      }
+
+      speakBtn.addEventListener('click', simulateScenario);
+
+      // Micro button: toggle speech recognition
+      micBtn.addEventListener('click', () => {
+        if (!recognition) {
+          addBubble('Speech recognition not available (use Chrome/Edge)', 'memo');
+          return;
+        }
+
+        if (isListening) {
+          recognition.stop();
+          isListening = false;
+          micBtn.textContent = '🎤 Micro';
+          micBtn.style.background = '#dc2626';
+        } else {
+          try {
+            recognition.start();
+            isListening = true;
+            micBtn.textContent = '🔴 Listening...';
+            micBtn.style.background = '#16a34a';
+          } catch (e) {
+            addBubble('Error starting microphone: ' + e, 'memo');
+            isListening = false;
+          }
+        }
+      });
+
+      input.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          const userText = input.value.trim();
+          addBubble(userText, 'user');
+          input.value = '';
+
+          // Send to assistant
+          try {
+            const res = await fetch('/api/assistant/respond', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                context: {
+                  preferredName: patientName,
+                  location: locationCtx,
+                  timeOfDay: new Date().getHours() < 12 ? 'morning' : (new Date().getHours() < 18 ? 'afternoon' : 'evening')
+                },
+                userMessage: userText
+              })
+            });
+            const data = await res.json();
+            if (data?.text) {
+              addBubble(data.text, 'memo');
+              speak(data.text);
+            }
+          } catch (err) {
+            addBubble('Error: ' + err, 'memo');
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
+
