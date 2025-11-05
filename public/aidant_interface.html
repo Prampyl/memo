@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Memo - Espace Famille / Marie</title>
+    <title>Memo - Family Space / Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
@@ -56,57 +56,57 @@
         <a href="index.html" style="color: #2563eb; text-decoration: none; font-weight: 600;">← Home</a>
       </div>
       <div class="header">
-        <div class="title">Memo — Espace Famille / Marie</div>
-        <div class="muted">Aujourd'hui: <span id="today">—</span></div>
+        <div class="title">Memo — Family Space / Marie</div>
+        <div class="muted">Today: <span id="today">—</span></div>
       </div>
 
       <div class="grid">
         <div class="card">
-          <div class="section-title">Dashboard de Sécurité</div>
+          <div class="section-title">Safety Dashboard</div>
           <div id="statusBadge" class="status">
-            <span>Statut: Tout va bien</span>
+            <span>Status: All good</span>
           </div>
-          <div class="footer-note" id="presenceNote">Aucune présence prolongée détectée.</div>
+          <div class="footer-note" id="presenceNote">No prolonged presence detected.</div>
         </div>
 
         <div class="card">
-          <div class="section-title">Journal d'Activité (5 dernières)</div>
+          <div class="section-title">Activity Log (Last 5)</div>
           <div class="list">
             <ul id="journalList"></ul>
           </div>
         </div>
 
         <div class="card">
-          <div class="section-title">Gestion du Répertoire de Vie</div>
+          <div class="section-title">Life Repertoire Management</div>
           <div class="row">
             <div style="flex:1">
-              <label>Nom du Docteur</label>
+              <label>Doctor's Name</label>
               <input id="doctor" placeholder="Dr Martin" />
             </div>
             <div style="flex:1">
-              <label>Événement préféré</label>
-              <input id="event" placeholder="Bal du samedi" />
+              <label>Favorite Event</label>
+              <input id="event" placeholder="Saturday Ball" />
             </div>
           </div>
           <div class="row" style="margin-top:10px">
             <div style="flex:1">
-              <label>Souvenir Clé</label>
-              <input id="memory" placeholder="Vacances 1998 à Nice" />
+              <label>Key Memory</label>
+              <input id="memory" placeholder="1998 holidays in Nice" />
             </div>
             <div style="flex:0 0 auto; align-self:flex-end">
-              <button id="saveProfile">Sauvegarder</button>
+              <button id="saveProfile">Save</button>
             </div>
           </div>
-          <div class="footer-note" id="saveHint">Les informations sont locales (simulation).</div>
+          <div class="footer-note" id="saveHint">Information is stored locally (simulation).</div>
         </div>
 
         <div class="card">
           <div class="section-title">Contact</div>
           <div class="row">
-            <button id="contactBtn">Contacter le Patient</button>
-            <button class="danger" id="alertBtn">Alerte Discrète</button>
+            <button id="contactBtn">Contact Patient</button>
+            <button class="danger" id="alertBtn">Discreet Alert</button>
           </div>
-          <div class="footer-note" id="contactHint">Simulation: envoi d'un message discret (non effectif).</div>
+          <div class="footer-note" id="contactHint">Simulation: sending a discreet message (not actually sent).</div>
         </div>
       </div>
     </div>
@@ -120,43 +120,52 @@
       const doctorEl = document.getElementById('doctor');
       const eventEl = document.getElementById('event');
       const memoryEl = document.getElementById('memory');
+      const spouseEl = document.getElementById('spouse');
+      const caregiverEl = document.getElementById('caregiver');
+      const childrenEl = document.getElementById('children');
+      const phoneEl = document.getElementById('phone');
       const contactBtn = document.getElementById('contactBtn');
       const alertBtn = document.getElementById('alertBtn');
       const contactHint = document.getElementById('contactHint');
       const saveHint = document.getElementById('saveHint');
 
       // Date
-      today.textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long' });
+      today.textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long' });
 
-      // Journal simulé
+      // Enhanced demo journal with realistic entries
       const entries = [
-        { time: '10:30', label: 'Rappel Hydratation' },
-        { time: '09:00', label: 'Aide à la Médication (Confirmé)' },
-        { time: '08:30', label: 'Orientation Matinale' },
-        { time: 'Hier 18:00', label: 'Rappel Dîner' },
-        { time: 'Hier 12:00', label: 'Rappel Déjeuner' },
+        { time: '14:15', label: 'Hydration reminder - Confirmed water intake', status: 'completed' },
+        { time: '10:30', label: 'Medication check - Morning vitamins confirmed', status: 'completed' },
+        { time: '09:00', label: 'Proactive greeting - Kitchen presence detected', status: 'completed' },
+        { time: '08:30', label: 'Morning routine reminder - Started conversation', status: 'completed' },
+        { time: 'Yesterday 18:00', label: 'Evening medication - Confirmed taken', status: 'completed' },
+        { time: 'Yesterday 14:00', label: 'Afternoon hydration - Gentle reminder given', status: 'completed' },
+        { time: 'Yesterday 12:00', label: 'Lunch reminder - Confirmed meal', status: 'completed' },
       ];
       function renderJournal() {
         journalList.innerHTML = '';
         for (const e of entries) {
           const li = document.createElement('li');
-          li.textContent = `${e.time} — ${e.label}`;
+          const statusIcon = e.status === 'completed' ? '✅' : '⏳';
+          li.textContent = `${statusIcon} ${e.time} — ${e.label}`;
+          li.style.marginBottom = '8px';
+          li.style.padding = '4px 0';
           journalList.appendChild(li);
         }
       }
       renderJournal();
 
-      // Sécurité simulée
+      // Simulated safety
       let prolongedPresence = false;
       function updateSafety() {
         if (prolongedPresence) {
           statusBadge.style.background = '#fee2e2';
           statusBadge.style.color = '#b91c1c';
-          presenceNote.textContent = 'Alerte : Présence prolongée dans la chambre.';
+          presenceNote.textContent = 'Alert: Prolonged presence detected in the bedroom.';
         } else {
           statusBadge.style.background = '#dbeafe';
           statusBadge.style.color = '#2563eb';
-          presenceNote.textContent = 'Aucune présence prolongée détectée.';
+          presenceNote.textContent = 'No prolonged presence detected.';
         }
       }
       updateSafety();
@@ -167,35 +176,83 @@
         updateSafety();
       }, 15000);
 
-      // Répertoire de vie (localStorage)
-      const STORAGE_KEY = 'memo_profile';
-      function loadProfile() {
+      // Load profile from database
+      async function loadProfile() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
-          const data = JSON.parse(raw);
-          doctorEl.value = data.doctor || '';
-          eventEl.value = data.event || '';
-          memoryEl.value = data.memory || '';
-        } catch {}
+          const res = await fetch('/api/patient/default');
+          if (res.ok) {
+            const patient = await res.json();
+            doctorEl.value = patient.doctor || '';
+            eventEl.value = patient.favoriteEvent || '';
+            memoryEl.value = patient.keyMemory || '';
+            spouseEl.value = patient.family?.spouse || '';
+            caregiverEl.value = patient.family?.caregiver || '';
+            childrenEl.value = patient.family?.children?.join(', ') || '';
+            phoneEl.value = patient.family?.phone || '';
+          } else {
+            // Load demo data if API fails
+            loadDemoData();
+          }
+        } catch (err) {
+          console.error('Error loading profile:', err);
+          loadDemoData();
+        }
       }
-      function saveProfile() {
-        const data = { doctor: doctorEl.value.trim(), event: eventEl.value.trim(), memory: memoryEl.value.trim() };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        saveHint.textContent = 'Données sauvegardées localement.';
-        setTimeout(() => saveHint.textContent = 'Les informations sont locales (simulation).', 2500);
+      
+      function loadDemoData() {
+        doctorEl.value = 'Dr. Martin';
+        eventEl.value = 'Saturday dance';
+        memoryEl.value = 'Vacation in Nice 1998';
+        spouseEl.value = 'Jean';
+        caregiverEl.value = 'Sophie';
+        childrenEl.value = 'Sophie, Pierre';
+        phoneEl.value = '+33 6 12 34 56 78';
+      }
+      
+      async function saveProfile() {
+        const children = childrenEl.value.split(',').map(c => c.trim()).filter(c => c);
+        const patientData = {
+          doctor: doctorEl.value.trim(),
+          favoriteEvent: eventEl.value.trim(),
+          keyMemory: memoryEl.value.trim(),
+          family: {
+            spouse: spouseEl.value.trim(),
+            caregiver: caregiverEl.value.trim(),
+            children: children,
+            phone: phoneEl.value.trim()
+          }
+        };
+        
+        try {
+          const res = await fetch('/api/patient/patient_001', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patientData)
+          });
+          
+          if (res.ok) {
+            saveHint.textContent = '✅ Data saved successfully!';
+            setTimeout(() => saveHint.textContent = 'Information is saved in the database.', 2500);
+          } else {
+            throw new Error('Save failed');
+          }
+        } catch (err) {
+          console.error('Error saving profile:', err);
+          saveHint.textContent = '❌ Error saving data.';
+          setTimeout(() => saveHint.textContent = 'Information is stored locally (simulation).', 2500);
+        }
       }
       loadProfile();
       saveProfileBtn.addEventListener('click', saveProfile);
 
       // Contact (simulation)
       contactBtn.addEventListener('click', () => {
-        contactHint.textContent = 'Message discret envoyé (simulation).';
-        setTimeout(() => contactHint.textContent = 'Simulation: envoi d'un message discret (non effectif).', 2500);
+        contactHint.textContent = 'Discreet message sent (simulation).';
+        setTimeout(() => contactHint.textContent = 'Simulation: sending a discreet message (not actually sent).', 2500);
       });
       alertBtn.addEventListener('click', () => {
-        contactHint.textContent = 'Alerte urgente envoyée (simulation).';
-        setTimeout(() => contactHint.textContent = 'Simulation: envoi d'un message discret (non effectif).', 2500);
+        contactHint.textContent = 'Urgent alert sent (simulation).';
+        setTimeout(() => contactHint.textContent = 'Simulation: sending a discreet message (not actually sent).', 2500);
       });
     </script>
   </body>

@@ -1,0 +1,54 @@
+{
+  "patients": [
+    {
+      "id": "patient_001",
+      "name": "Marie",
+      "preferredName": "Marie",
+      "age": 78,
+      "doctor": "Dr. Martin",
+      "location": "kitchen",
+      "favoriteEvent": "Saturday dance",
+      "keyMemory": "Vacation in Nice 1998",
+      "family": {
+        "spouse": "Jean",
+        "children": ["Sophie", "Pierre"],
+        "caregiver": "Sophie",
+        "emergencyContact": "Jean",
+        "phone": "+33 6 12 34 56 78",
+        "relationship": {
+          "Sophie": "daughter",
+          "Pierre": "son",
+          "Jean": "husband"
+        }
+      },
+      "routines": {
+        "morning": "Take vitamins with breakfast",
+        "afternoon": "Hydration reminder at 2pm",
+        "evening": "Check medication"
+      },
+      "games": {
+        "favorites": ["Memory Cards", "Name That Tune", "Story Time"],
+        "lastPlayed": "Memory Cards",
+        "lastPlayedDate": "Yesterday"
+      },
+      "medications": [
+        {
+          "name": "Morning Vitamins",
+          "time": "08:00",
+          "location": "Kitchen cabinet, second shelf"
+        },
+        {
+          "name": "Evening Medication",
+          "time": "18:00",
+          "location": "Bedroom nightstand"
+        }
+      ],
+      "preferences": {
+        "tone": "warm and reassuring",
+        "language": "English",
+        "voiceSpeed": "slightly slower"
+      }
+    }
+  ]
+}
+

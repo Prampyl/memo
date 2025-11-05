@@ -87,6 +87,7 @@
       let suppressUntil = 0;
       let recognition = null;
       let isListening = false;
+      const sessionId = 'sensor_' + Date.now();
 
       // Initialize Speech Recognition (STT)
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -114,7 +115,7 @@
             const res = await fetch('/api/assistant/respond', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ context, userMessage: transcript })
+              body: JSON.stringify({ context, userMessage: transcript, sessionId: sessionId })
             });
             const data = await res.json();
             if (data?.text) {
@@ -182,7 +183,7 @@
           const res = await fetch('/api/assistant/respond', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context })
+            body: JSON.stringify({ context, sessionId: sessionId })
           });
           const data = await res.json();
           if (data?.text) {
