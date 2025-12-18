@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Patient",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "name": { "type": "string" },
+    "diagnosis": { "type": "string" },
+    "caregiver_ids": { 
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" }
+    }
+  },
+  "required": ["id", "name"]
+}
