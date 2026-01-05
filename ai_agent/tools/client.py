@@ -14,10 +14,13 @@ from .schemas import (
 )
 
 class ToolClient:
-    def __init__(self, base_url: Optional[str] = None):
-        # TODO: Load from .env properly
-        self.base_url = base_url or os.getenv("BACKEND_API_URL", "http://localhost:3000")
-        self.headers = {"Content-Type": "application/json"}
+    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None):
+        self.base_url = base_url or os.getenv("BACKEND_API_URL", "http://localhost:8000")
+        self.api_key = api_key or os.getenv("BACKEND_API_KEY", "memo-secret-key")
+        self.headers = {
+            "Content-Type": "application/json",
+            "X-API-KEY": self.api_key
+        }
 
     def _post(self, endpoint: str, data: BaseModel) -> Dict[str, Any]:
         url = f"{self.base_url}{endpoint}"
