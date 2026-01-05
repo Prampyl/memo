@@ -1,0 +1,58 @@
+{
+  "rationale": "Common schema for defining tools passed to the LLM. Ensures strict typing for the Router.",
+  "tools": [
+    {
+      "name": "schedule_reminder",
+      "description": "Sets a new reminder for the patient.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "What to remind the patient about"
+          },
+          "time_iso": {
+            "type": "string",
+            "description": "ISO 8601 formatted time string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        },
+        "required": ["text", "time_iso"]
+      }
+    },
+    {
+      "name": "search_memory",
+      "description": "Retrieves past conversations or specific facts about the patient.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Semantic search query"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "log_daily_event",
+      "description": "Logs a significant event to the daily journal.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "enum": ["mood", "activity", "health"]
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": ["event_type", "description"]
+      }
+    }
+  ]
+}
