@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS Reminder (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     patient_id UUID REFERENCES Patient(id) ON DELETE CASCADE,
     title VARCHAR(200) NOT NULL, spoken_message TEXT NOT NULL, 
-    scheduled_time TIME NOT NULL, category VARCHAR(50) NOT NULL, is_active BOOLEAN DEFAULT TRUE
+    scheduled_time TIMESTAMP WITH TIME ZONE NOT NULL, category VARCHAR(50) NOT NULL, is_active BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS Device (

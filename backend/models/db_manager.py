@@ -6,10 +6,10 @@ class MemoDB:
     def __init__(self):
         self.conn_params = {
             "dbname": "memo_db",
-            "user": os.getlogin(),
-            "password": "",
-            "host": "localhost",
-            "port": "5432"
+            "user": os.getenv("DB_USER", "postgres"),
+            "password": os.getenv("DB_PASS", "postgres"),
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": os.getenv("DB_PORT", "5432")
         }
 
     def _execute_query(self, query, params=None, fetch=False):

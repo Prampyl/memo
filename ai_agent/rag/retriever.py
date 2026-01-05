@@ -10,7 +10,11 @@ import os
 import chromadb
 from typing import List, Optional, Dict
 from pydantic import BaseModel
-import google.generativeai as genai
+import os
+import chromadb
+from typing import List, Optional, Dict
+from pydantic import BaseModel
+from google import genai
 
 # Models
 class Document(BaseModel):
@@ -24,24 +28,23 @@ class RAGRetriever:
         if not self.api_key:
             raise ValueError("GOOGLE_API_KEY environment variable not set.")
         
-        genai.configure(api_key=self.api_key)
+        self.client = genai.Client(api_key=self.api_key)
         
         # Initialize ChromaDB (Persistent)
-        self.client = chromadb.PersistentClient(path=persistence_path)
+        self.chroma_client = chromadb.PersistentClient(path=persistence_path)
         
         # Get or Create Collection
-        self.collection = self.client.get_or_create_collection(name="memo_knowledge_base")
+        self.collection = self.chroma_client.get_or_create_collection(name="memo_knowledge_base")
 
     def _embed_text(self, text: str) -> List[float]:
         """
-        Generates embeddings using Google's embedding-001 model.
+        Generates embeddings using Google's text-embedding-004 model.
         """
-        result = genai.embed_content(
-            model="models/embedding-001",
-            content=text,
-            task_type="retrieval_query"
+        response = self.client.models.embed_content(
+            model="text-embedding-004",
+            contents=text
         )
-        return result['embedding']
+        return response.embeddings[0].values
 
     def add_documents(self, documents: List[Document]):
         """
@@ -51,8 +54,7 @@ class RAGRetriever:
         texts = [doc.text for doc in documents]
         metadatas = [doc.metadata for doc in documents]
         
-        # Batch embed (Google supports batching, but doing simple loop for safety/clarity here)
-        # Optimization: Use batch API if volume is high
+        # Batch embed (Looping for safety)
         embeddings = [self._embed_text(text) for text in texts]
         
         self.collection.upsert(

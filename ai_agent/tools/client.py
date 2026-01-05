@@ -8,6 +8,7 @@ Uses synchronous `requests` for simplicity, but could be async.
 import os
 import requests
 from typing import Optional, Dict, Any
+from pydantic import BaseModel
 from .schemas import (
     CreateReminderRequest, CreateReminderResponse,
     LogEventRequest, MemorySearchRequest, MemorySearchResponse

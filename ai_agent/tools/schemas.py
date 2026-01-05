@@ -17,10 +17,10 @@ class ToolResponse(BaseModel):
 
 # --- Reminder Tool ---
 class CreateReminderRequest(BaseModel):
-    patient_id: str = Field(..., description="UUID of the patient")
+    patientId: str = Field(..., description="UUID of the patient")
     message: str = Field(..., description="The spoken message content")
     schedule: str = Field(..., description="ISO8601 formatted datetime string")
-    priority: Literal["low", "medium", "high"] = "medium"
+    category: str = "General"
 
 class CreateReminderResponse(BaseModel):
     id: str
