@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+        }
+
+        .standby-container {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            background-image: url('/images/family.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0);
+            /* Tamisé */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* Push content to bottom */
+            padding-bottom: 5vh;
+        }
+
+        .info-bar {
+            padding: 0 5vw;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .time-display h1 {
+            font-size: 8vh;
+            margin: 0;
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        .time-display h2 {
+            font-size: 3vh;
+            margin: 1vh 0 0 0;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .reminder-display {
+            text-align: right;
+            max-width: 50%;
+        }
+
+        .reminder-display p {
+            font-size: 3.5vh;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .reminder-display small {
+            font-size: 2vh;
+            display: block;
+            margin-top: 0.5vh;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="standby-container">
+        <div class="overlay">
+            <div class="info-bar">
+                <div class="time-display">
+                    <h1 id="currentTime">--:--</h1>
+                    <h2 id="currentDate">...</h2>
+                </div>
+                <div class="reminder-display">
+                    <p>Meet up with Sarah at 2:00 PM</p>
+                    <small>Next Reminder</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Automatic time update
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            document.getElementById('currentTime').textContent = timeString;
+            document.getElementById('currentDate').textContent = dateString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Initial Fade In
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.8s ease-in-out';
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Tap to wake up / go back to main interface
+        document.body.addEventListener('click', () => {
+            window.location.href = '/patient';
+        });
+
+        // Demo Loop Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('demo') === 'true') {
+            console.log('Demo mode active: Switching to Caregiver Dashboard in 5s');
+
+            setTimeout(() => {
+                document.body.style.opacity = '0';
+            }, 4200);
+
+            setTimeout(() => {
+                window.location.href = '/caregiver?demo=true';
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

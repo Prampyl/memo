@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MEMO - Memory Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, rgba(108, 206, 215, 0.3) 0%, rgba(150, 228, 192, 0.3) 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        .game-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #2e7d32;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .title {
+            color: #2e7d32;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            width: 800px;
+            max-width: 95vw;
+        }
+
+        .card-container {
+            aspect-ratio: 1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s;
+            border: none;
+            border-radius: 15px;
+            background: transparent;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .card-front {
+            background: linear-gradient(45deg, #6aced7, #96e4c0);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            color: #2e7d32;
+            border: 4px solid #96e4c0;
+        }
+
+        /* Highlight animation for matches */
+        .card.matched .card-back {
+            background: #e0f2f1;
+            box-shadow: 0 0 15px #96e4c0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <a href="/patient" class="back-btn">
+                <i class="bi bi-house-fill"></i>
+            </a>
+            <h1 class="title">Memory Game</h1>
+            <div style="width: 60px;"></div> <!-- Spacer -->
+        </div>
+
+        <div class="memory-grid">
+            <!-- Row 1 -->
+            <!-- Pair 1: Matched (Nature) -->
+            <div class="card-container">
+                <div class="card flipped matched">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/nature1/200" alt="Nature"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card flipped matched">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/nature1/200" alt="Nature"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pair 2: Hidden (Animal) -->
+            <div class="card-container" onclick="flipCard(this)">
+                <div class="card">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/animal1/200" alt="Animal"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+            <div class="card-container" onclick="flipCard(this)">
+                <div class="card">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/animal1/200" alt="Animal"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <!-- Pair 3: One flipped (Architecture) -->
+            <div class="card-container">
+                <div class="card flipped">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/arch1/200" alt="Architecture"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+            <!-- Pair 3 match: Hidden -->
+            <div class="card-container" onclick="flipCard(this)">
+                <div class="card">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/arch1/200" alt="Architecture"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pair 4: Hidden (Food) -->
+            <div class="card-container" onclick="flipCard(this)">
+                <div class="card">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/food1/200" alt="Food"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+            <div class="card-container" onclick="flipCard(this)">
+                <div class="card">
+                    <div class="card-face card-front"><i class="bi bi-question-lg"></i></div>
+                    <div class="card-face card-back">
+                        <img src="https://picsum.photos/seed/food1/200" alt="Food"
+                            style="width:100%; height:100%; border-radius:15px; object-fit:cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth Fade In on Load
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.8s ease-in-out';
+
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+            startAutoPlay();
+        });
+
+        function flipCard(container) {
+            const card = container.querySelector('.card');
+            if (!card.classList.contains('flipped') && !card.classList.contains('matched')) {
+                card.classList.add('flipped');
+
+                // Logic based on image src
+                const flippedCards = Array.from(document.querySelectorAll('.card.flipped:not(.matched)'));
+
+                if (flippedCards.length === 2) {
+                    const img1 = flippedCards[0].querySelector('.card-back img').src;
+                    const img2 = flippedCards[1].querySelector('.card-back img').src;
+
+                    if (img1 === img2) {
+                        // Match found
+                        setTimeout(() => {
+                            flippedCards.forEach(c => c.classList.add('matched'));
+                        }, 500);
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            flippedCards.forEach(c => c.classList.remove('flipped'));
+                        }, 1500);
+                    }
+                }
+            }
+        }
+
+        function startAutoPlay() {
+            // Logic adapted for new images (indexes remain same)
+            // 0,1=nature(matched), 2,3=animal, 4=arch(flipped), 5=arch(hidden), 6,7=food
+            const containers = document.querySelectorAll('.card-container');
+
+            setTimeout(() => { simulateClick(containers[5]); }, 1500); // Match arch
+            setTimeout(() => { simulateClick(containers[2]); }, 3000); // Try animal
+            setTimeout(() => { simulateClick(containers[3]); }, 4000); // Match animal
+        }
+
+        function simulateClick(element) {
+            element.click();
+            element.style.transform = "scale(0.95)";
+            setTimeout(() => element.style.transform = "scale(1)", 150);
+        }
+
+        // Demo Loop Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('demo') === 'true') {
+            console.log('Demo mode active: Switching to Standby in 10s');
+
+            setTimeout(() => {
+                document.body.style.opacity = '0';
+            }, 9200);
+
+            setTimeout(() => {
+                window.location.href = '/patient/standby?demo=true';
+            }, 10000);
+        }
+    </script>
+</body>
+
+</html>

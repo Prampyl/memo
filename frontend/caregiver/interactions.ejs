@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+    <a href="/caregiver" class="btn btn-outline-secondary mb-3">&larr; Back</a>
+    <h1><%= title %></h1>
+    <div class="list-group">
+        <% interactions.forEach(function(interaction) { %>
+            <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1"><%= interaction.type %></h5>
+                    <small><%= interaction.date %></small>
+                </div>
+                <p class="mb-1">Q: <%= interaction.question %></p>
+                <small>A: <%= interaction.answer %></small>
+            </div>
+        <% }); %>
+    </div>
+</body>
+</html>

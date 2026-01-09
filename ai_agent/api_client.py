@@ -98,6 +98,29 @@ class GeminiProvider(LLMProvider):
             print(f"DEBUG: Gemini SDK Error: {e}")
             raise e
 
+class MockProvider(LLMProvider):
+    def generate(self, system_prompt: str, user_content: str, tools: Optional[List[Dict]] = None) -> Dict[str, Any]:
+        """
+        Returns a mock response instantly.
+        """
+        # Simple rule-based mock for demo
+        lower_content = user_content.lower()
+        response_text = "I'm sorry, I didn't catch that."
+
+        if "time" in lower_content:
+            from datetime import datetime
+            response_text = f"It is currently {datetime.now().strftime('%I:%M %p')}."
+        elif "hello" in lower_content or "hi" in lower_content:
+            response_text = "Hello! I am MEMO, your assistant. How can I help you today?"
+        elif "where" in lower_content:
+            response_text = "You are at home, safe in your living room."
+        elif "reminder" in lower_content:
+            response_text = "I have noted that down."
+        else:
+            response_text = "I heard you say: " + user_content
+
+        return {"content": response_text, "tool_calls": []}
+
 class LLMClient:
     def __init__(self, provider: LLMProvider):
         self.provider = provider
@@ -116,4 +139,7 @@ class LLMClient:
 
 # Factory
 def get_llm_client() -> LLMClient:
+    if os.getenv("USE_MOCK_LLM", "false").lower() == "true":
+        print("DEBUG: Using Mock LLM Provider")
+        return LLMClient(provider=MockProvider())
     return LLMClient(provider=GeminiProvider())

@@ -35,7 +35,11 @@ class ActionHandler:
         print(f"   [ActionHandler] Processing: {user_query}")
 
         # 1. RAG Retrieve
-        docs = self.retriever.retrieve(patient_id, user_query)
+        if os.getenv("USE_MOCK_LLM", "false").lower() == "true":
+            docs = []
+            print("   [ActionHandler] Skipping RAG in Mock Mode")
+        else:
+            docs = self.retriever.retrieve(patient_id, user_query)
         rag_context = "\n".join([f"- {d.text}" for d in docs]) if docs else "No relevant memory found."
 
         # 2. Prepare Context
